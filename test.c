@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <time.h>
-#include <string.h>
 
 /******************************************
  *                PLATEAU                 *
@@ -263,44 +262,6 @@ int verif_compt(compteur c1, compteur c2){
 }
 
 /******************************************
- *           REPONSEs JOUEURS             *
- ******************************************/
-
-/* structure representant un coup */
-typedef struct{
-  position pos;
-  joueur pl;
-  direction dir;
-}coup;
-
-/* fonction demandant un coup a jouer */
-void choose_move(coup c){
-  int flag, i, j;
-  char dir;
-  do{
-        flag = 1;
-        printf("choose a pawn and a direction to move (i, j, dir): ");
-        scanf("%d, %d, %c", &i, &j, &dir);
-        switch (dir) {
-          case 'N': c.dir = NORD; break;
-          case 'S': c.dir = SUD; break;
-          case 'E': c.dir = EST; break;
-          case 'O': c.dir = OUEST; break;
-          default :
-            flag = 0;
-            printf("Invalid direction, direction must be N, S, E, or W.\n");
-        }
-        if(i < 0 || i >= SIZE || j < 0 || j >= SIZE){
-          flag = 0;
-          printf("Positions invalides, les positions i et j doivent être comprise entre 0 et %d.\n", SIZE-1);
-        }
-        else{
-          c.pos.i = i;
-          c.pos.j = j;
-        }
-      }while(!flag);
-}
-/******************************************
  *        DETECTION D'UN GAGNANT          *
  ******************************************/
 
@@ -326,6 +287,13 @@ result winner(compteur compt){
  *           FONCTION PRINCIPALE          *
  ******************************************/
 
+/* structure representant un coup */
+typedef struct{
+  position pos;
+  joueur pl;
+  direction dir;
+}coup;
+
 /* type reponses de la fonction principale */
 typedef enum {
   EMPTY_POS,
@@ -337,33 +305,19 @@ typedef enum {
   SUCCES
 }erreur;
 
-//fonction pr savoir s'il y a un espace derriere 14
-//TRUE=pas d'espace
-//FALSE=il y a un espace ou vide
+//fonction pr savoir s'il y a un espace 14
 int sansespace (content b[SIZE][SIZE], coup c){
  switch(c.dir){
     case NORD:
-    if(c.pos.i == SIZE-1){
-      return 0;
-    }
-    return (b[c.pos.i+1][c.pos.j]!=EMPTY);
+    return (b[(c.pos.i)+1][c.pos.j]!=EMPTY);
 
     case SUD:
-    if(c.pos.i == 0){
-      return 0;
-    }
     return (b[c.pos.i-1][c.pos.j]!=EMPTY);
 
     case EST:
-    if(c.pos.j == 0){
-      return 0;
-    }
     return (b[c.pos.i][c.pos.j-1]!=EMPTY);
 
     case OUEST:
-    if(c.pos.j == SIZE-1){
-      return 0;
-    }
     return (b[c.pos.i][c.pos.j+1]!=EMPTY);
   }
   return 0;
@@ -413,7 +367,6 @@ content sortie_pion(content (*b)[SIZE], coup c){
     return b[c.pos.i][n];
   }
 }
-
 //fonction reponse 16
 erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
   if (b[c.pos.i][c.pos.j]==EMPTY){
@@ -425,10 +378,6 @@ erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
   else if((c.pl==JOUW && b[c.pos.i][c.pos.j]==BLACK_P) || (c.pl==JOUB && b[c.pos.i][c.pos.j]==WHITE_P)){
     return PION_ADVERSE;
   }
-  //pion directement après celui qu'on veut bouger
-  if ((sansespace(b, c))==1){
-    return PAS_ESPACE;
-  }
   //sortie de son propre pion
   if((c.pl==JOUW && sortie_pion(b, c)==WHITE_P)|| (c.pl==JOUB && sortie_pion(b, c)==BLACK_P)){
     return SORTIE_MONPION;
@@ -436,6 +385,11 @@ erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
   //retour en arriere
   else if(c.pos.i == ban -> a && c.pos.j == ban -> b && c.dir == ban -> d){
     return RETOUR_EN_ARRIERE;
+  }
+
+  //pion directement après celui qu'on veut bouger
+  if ((sansespace(b, c))==1){
+    return PAS_ESPACE;
   }
   return SUCCES;
 }
@@ -518,15 +472,6 @@ void print_board(content (*b)[SIZE]) {
   printf("\n");
 }
 
-void print_tour(coup c){
-  if(c.pl == JOUW){
-    printf("White's turn to play\n");
-  }
-  else{
-    printf("Black's turn to play\n");
-  }
-}
-
 
 //condition pr gagner : 7 billes r ou toutes les billes adverses
 /******************************************
@@ -535,7 +480,6 @@ void print_tour(coup c){
 
 int main(){
   srand((time(NULL)));
-
   coup c;
   c.pl=JOUW;
   content plateau[SIZE][SIZE], a;
@@ -544,99 +488,116 @@ int main(){
   ban.a = ban.b = -1;
   ban.d = OUEST;
   erreur err;
-  char replay, t;
-  int pl, k, l;
+  //char replay, direct;
+  init_board(plateau);
   compt.nb_b = compt.nb_w = compt2.nb_b = compt2.nb_w = 0;
   compt.nb_rb = compt.nb_rw = compt2.nb_rb = compt2.nb_rw = 0;
-
-  printf("\nKuba ready to play !!!\n\n");
+  print_board(plateau);
+  int pl;
   printf("How many players (1 or 2)? : ");
   scanf("%d", &pl);
-  printf("\n\n");
-
-  int flag;
-
-  init_board(plateau);
-  print_board(plateau);
-
-  printf("\nWhite begin\n");
+  printf("White begin\n");
+/*
   //if (pl==2){
     while (winner(compt)==PLAYING){
-      choose_move(c);
+      printf("choose a pawn and a direction to move (i, j, dir): ");
+      scanf("%d, %d, %c", &c.pos.i, &c.pos.j, &direct);
+      c.dir = NORD;
+      printf("%d\n", c.dir);
       err = reply(plateau, c, &ban);
-      switch (err){
-        case EMPTY_POS:
-        printf ("\nThe position is empty\n");
-        continue;
-
-        case PION_RED:
-        printf ("\nRed pawns can't be moved\n");
-        continue;
-
-        case PION_ADVERSE:
-        printf ("\nIt is not your pawn\n");
-        continue;
-
-        case PAS_ESPACE:
-        printf ("\nThere is a pawn right behind\n");
-        continue;
-
-        case RETOUR_EN_ARRIERE:
-        printf ("\nPawns positions are back to your last turn ones\n");
-        continue;
-
-        case SORTIE_MONPION:
-        printf ("\nYour own pawn got out of the board\n"); continue;
-
-        case SUCCES:
+      printf("ok !!");
+      if(err == SUCCES){
         a = deplacement(plateau, c.pos, c.dir, &ban);
         compte(a, c.pl, &compt);
-        printf("\n\n");
         print_board(plateau);
-
         if (verif_compt(compt, compt2) == 1){
           compt2.nb_rw = compt.nb_rw;
           compt2.nb_w = compt.nb_w;
           compt2.nb_rb = compt.nb_rb;
           compt2.nb_b = compt.nb_b;
-
-          if (winner(compt)!=PLAYING){
-            break;
-          }
-
-          printf ("would you like to replay ? (y or n) : ");
-          scanf (" %c", &replay);
-
+          printf("would you like to replay ? (y or n) : ");
+          scanf("%c\n", &replay);
           if(replay == 'n'){
-            c.pl = tour(c.pl);
+            tour(c.pl);
           }
         }
-        else {
-          c.pl=tour(c.pl);
+        else{
+          tour(c.pl);
         }
-
       }
+      else{
+        switch (err){
+          case EMPTY_POS:
+          printf ("The position is empty");
 
-      print_tour(c);
-    }
-    result win;
-    win = winner(compt);
-    switch(win){
-      case WHITE_WIN: printf("White Win's !!"); break;
-      case BLACK_WIN: printf("Black win's !!"); break;
-      default: break;
-    }
-    //}
-  //}
-  return 0;
-}
+          case PION_RED:
+          printf ("Red pawns can't be moved");
+
+          case PION_ADVERSE:
+          printf ("It is not your pawn");
+
+          case PAS_ESPACE:
+          printf ("There is a pawn right behind");
+
+          case RETOUR_EN_ARRIERE:
+          printf ("Pawns positions are back to your last turn one");
+
+          case SORTIE_MONPION:
+          printf ("Your own pawn got out of the board");
+
+          default : continue;
+        }
+      }
+    }*/
+
 /*
   else if(pl==1){
     while (winner(compt)==PLAYING){
 
     }
+  }*/
+  int k, l;
+  char t;
+  printf("choose a pawn and a direction to move (i, j, dir): ");
+  scanf("%d, %d, %c", &k, &l, &t);
+  c.pos.i = k;
+  c.pos.j = l;
+  switch (t) {
+    case 'N': c.dir = NORD; break;
+    case 'S': c.dir = SUD; break;
+    case 'E': c.dir = EST; break;
+    case 'O': c.dir = OUEST; break;
   }
+  err = reply(plateau, c, &ban);
+  printf("%d\n", err);
+  a = deplacement(plateau, c.pos, c.dir, &ban);
+  printf("%d\n", a);
+  print_board(plateau);
+  compte(a, JOUB, &compt);
+  printf("%d , %d , %d , %d\n", compt.nb_rw, compt.nb_w, compt.nb_b, compt.nb_rb);
+  printf("%d, %d, %d\n", ban.a, ban.b, ban.d);
 
+/*
+  c.pos.i = 5;
+  c.pos.j = 1;
+  c.dir = NORD;
+  a = deplacement(plateau, c.pos, c.dir, &ban);
+  printf("%d\n", a);
+  print_board(plateau);
+  compte(a, JOUB, &compt);
+  printf("%d , %d , %d , %d\n", compt.nb_rw, compt.nb_w, compt.nb_b, compt.nb_rb);
+  printf("%d, %d, %d\n", ban.a, ban.b, ban.d);
+
+
+  c.pos.i = 4;
+  c.pos.j = 1;
+  c.dir = NORD;
+  a = deplacement(plateau, c.pos, c.dir, &ban);
+  printf("%d\n", a);
+  print_board(plateau);
+  compte(a, JOUB, &compt);
+  printf("%d , %d , %d , %d\n", compt.nb_rw, compt.nb_w, compt.nb_b, compt.nb_rb);
+  printf("%d, %d, %d\n", ban.a, ban.b, ban.d);*/
 
   return 0;
-}*/
+}
