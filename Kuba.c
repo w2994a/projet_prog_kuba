@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdio_ext.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
@@ -274,32 +275,70 @@ typedef struct{
 }coup;
 
 /* fonction demandant un coup a jouer */
-void choose_move(coup c){
-  int flag, i, j;
-  char dir;
+void choose_move1(coup *c){
+  int flag, k, l;
+  char t;
   do{
-        flag = 1;
-        printf("choose a pawn and a direction to move (i, j, dir): ");
-        scanf("%d, %d, %c", &i, &j, &dir);
-        switch (dir) {
-          case 'N': c.dir = NORD; break;
-          case 'S': c.dir = SUD; break;
-          case 'E': c.dir = EST; break;
-          case 'O': c.dir = OUEST; break;
-          default :
-            flag = 0;
-            printf("Invalid direction, direction must be N, S, E, or W.\n");
-        }
-        if(i < 0 || i >= SIZE || j < 0 || j >= SIZE){
-          flag = 0;
-          printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
-        }
-        else{
-          c.pos.i = i;
-          c.pos.j = j;
-        }
-      }while(!flag);
+    flag = 1;
+    printf("choose a pawn and a direction to move (i, j, dir): ");
+    scanf("%d, %d, %s", &k, &l, &t);
+    switch (t) {
+      case 'N': c -> dir = NORD; break;
+      case 'S': c -> dir = SUD; break;
+      case 'E': c -> dir = EST; break;
+      case 'W': c -> dir = OUEST; break;
+      default : flag = 0; printf("Invalid direction, direction must be N, S, E, or W.\n");
+      }
+      if(k < 0 || k >= SIZE || l < 0 || l >= SIZE){
+        flag = 0;
+        printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
+      }
+      else{
+        c -> pos.i = k;
+        c -> pos.j = l;
+      }
+    }while(!flag);
 }
+
+void choose_move2(coup *c){
+  int k, i, j, flag;
+  char dir;
+
+  printf("\nchoose a pawn and a direction to move (i, j, dir): \n");
+  do{
+      printf("choose a position i :");
+      k = scanf ("%d", &i);
+      __fpurge (stdin);
+      if (!k) {
+        printf("Invalid positions, positions i must be between 0 and %d.\n", SIZE-1);
+      }
+  }while (!k);
+
+  do{
+      printf("choose a position j :");
+      k = scanf ("%d", &j);
+      __fpurge (stdin);
+      if (!k) {
+        printf("Invalid positions, positions j must be between 0 and %d.\n", SIZE-1);
+      }
+  }while (!k);
+
+  do{
+      flag = 1;
+      printf("choose a direction (dir): ");
+      scanf(" %c", &dir);
+      switch (dir) {
+        case 'N': c -> dir = NORD; break;
+        case 'S': c -> dir = SUD; break;
+        case 'E': c -> dir = EST; break;
+        case 'W': c -> dir = OUEST; break;
+        default : flag = 0; printf("Invalid direction, direction must be N, S, E, or W.\n");
+      }
+  }while(!flag);
+  c -> pos.i = i;
+  c -> pos.j = j;
+}
+
 /******************************************
  *        DETECTION D'UN GAGNANT          *
  ******************************************/
@@ -495,8 +534,40 @@ void affichage_bord_droite(int i){
     }
 }
 
-//fonction d'affichage du plateau :
-void print_board(content (*b)[SIZE]) {
+/* fonction d'affichage du joueur dont c'est le tour */
+void print_tour(coup c){
+  if(c.pl == JOUW){
+    printf("\nWhite's turn to play\n");
+  }
+  else{
+    printf("\nBlack's turn to play\n");
+  }
+}
+
+/* fonction d'affichage des lignes du tableau des scores */
+void print_line(){
+  int i;
+  for(i=0; i<20; i++){
+    printf("- ");
+  }
+}
+
+/* fonction d'affichage des points */
+void print_score(compteur *compt){
+  print_line();
+  printf("\n|               SCORE                 |\n");
+  print_line();
+  printf("\n| Player | Opponent's pawn | Red pawn |\n");
+  printf("|        |    captured     | captured |\n");
+  print_line();
+  printf("\n| WHITE  |        %d        |    %d     |\n",compt -> nb_b, compt -> nb_rw);
+  print_line();
+  printf("\n| BLACK  |        %d        |    %d     |\n",compt -> nb_w, compt -> nb_rb);
+  print_line();
+}
+
+/* fonction d'affichage du plateau */
+void print_board(content (*b)[SIZE], compteur *compt) {
   int i, j;
 
   affichage_num_col();
@@ -515,18 +586,9 @@ void print_board(content (*b)[SIZE]) {
     printf("|\n");
   }
   affichage_bord();
+  print_score(compt);
   printf("\n");
 }
-
-void print_tour(coup c){
-  if(c.pl == JOUW){
-    printf("White's turn to play\n");
-  }
-  else{
-    printf("Black's turn to play\n");
-  }
-}
-
 
 //condition pr gagner : 7 billes r ou toutes les billes adverses
 /******************************************
@@ -544,8 +606,8 @@ int main(){
   ban.a = ban.b = -1;
   ban.d = OUEST;
   erreur err;
-  char replay, t;
-  int pl, k, l;
+  char replay;
+  int pl;
   compt.nb_b = compt.nb_w = compt2.nb_b = compt2.nb_w = 0;
   compt.nb_rb = compt.nb_rw = compt2.nb_rb = compt2.nb_rw = 0;
 
@@ -554,15 +616,12 @@ int main(){
   scanf("%d", &pl);
   printf("\n\n");
 
-  int flag;
-
   init_board(plateau);
-  print_board(plateau);
-
+  print_board(plateau, &compt);
   printf("\nWhite begin\n");
   //if (pl==2){
     while (winner(compt)==PLAYING){
-      choose_move(c);
+      choose_move1(&c);
       err = reply(plateau, c, &ban);
       switch (err){
         case EMPTY_POS:
@@ -592,7 +651,7 @@ int main(){
         a = deplacement(plateau, c.pos, c.dir, &ban);
         compte(a, c.pl, &compt);
         printf("\n\n");
-        print_board(plateau);
+        print_board(plateau, &compt);
 
         if (verif_compt(compt, compt2) == 1){
           compt2.nb_rw = compt.nb_rw;
@@ -604,8 +663,8 @@ int main(){
             break;
           }
 
-          printf ("would you like to replay ? (y or n) : ");
-          scanf (" %c", &replay);
+          printf ("\nwould you like to replay ? (y or n) : ");
+          scanf ("%s", &replay);
 
           if(replay == 'n'){
             c.pl = tour(c.pl);
