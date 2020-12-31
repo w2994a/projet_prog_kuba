@@ -292,7 +292,7 @@ void choose_move(coup c){
         }
         if(i < 0 || i >= SIZE || j < 0 || j >= SIZE){
           flag = 0;
-          printf("Positions invalides, les positions i et j doivent être comprise entre 0 et %d.\n", SIZE-1);
+          printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
         }
         else{
           c.pos.i = i;
