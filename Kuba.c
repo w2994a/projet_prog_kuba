@@ -264,7 +264,7 @@ int verif_compt(compteur c1, compteur c2){
 }
 
 /******************************************
- *           REPONSEs JOUEURS             *
+ *           REPONSES JOUEURS             *
  ******************************************/
 
 /* structure representant un coup */
@@ -274,7 +274,22 @@ typedef struct{
   direction dir;
 }coup;
 
-/* fonction demandant un coup a jouer */
+/* fonction demandant le nombre de joueurs */
+int choose_nb_player(){
+  int k, pl;
+  do{
+      printf("choose a number of players (1 or 2) :");
+      k = scanf ("%d", &pl);
+      __fpurge (stdin);
+      if (!k) {
+        printf("invalid entry, the number of players must be 1 or 2.");
+      }
+  }while (!k);
+  printf("\n\n");
+  return pl;
+}
+
+/* fonction demandant un coup a jouer au joueur */
 void choose_move1(coup *c){
   int flag, k, l;
   char t;
@@ -300,7 +315,8 @@ void choose_move1(coup *c){
     }while(!flag);
 }
 
-void choose_move2(coup *c){
+/* fonction demandant un coup a jouer au joueur*/
+void choose_move(coup *c){
   int k, i, j, flag;
   char dir;
 
@@ -312,6 +328,10 @@ void choose_move2(coup *c){
       if (!k) {
         printf("Invalid positions, positions i must be between 0 and %d.\n", SIZE-1);
       }
+      if(i < 0 || i >= SIZE){
+        k = 0;
+        printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
+      }
   }while (!k);
 
   do{
@@ -320,6 +340,10 @@ void choose_move2(coup *c){
       __fpurge (stdin);
       if (!k) {
         printf("Invalid positions, positions j must be between 0 and %d.\n", SIZE-1);
+      }
+      if(j < 0 || j >= SIZE){
+        k = 0;
+        printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
       }
   }while (!k);
 
@@ -339,6 +363,22 @@ void choose_move2(coup *c){
   c -> pos.j = j;
 }
 
+/* fonction demandant au joueur si il souhaite rejouer */
+
+char choose_replay(){
+  int flag; char rp;
+  do{
+      flag = 1;
+      printf("would you like to replay ? (y or n) : ");
+      scanf(" %c", &rp);
+      switch (rp) {
+        case 'y': break;
+        case 'n': break;
+        default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+      }
+  }while(!flag);
+  return rp;
+}
 /******************************************
  *        DETECTION D'UN GAGNANT          *
  ******************************************/
@@ -360,6 +400,52 @@ result winner(compteur compt){
   }
   return PLAYING;
 }
+
+/******************************************
+ *         SAUVEGARDE / CHARGEMENT        *
+ ******************************************/
+
+/* fonction de sauvegarde du jeu */
+void sauvegarde(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt, int size){
+  FILE *fw;
+  int i, j;
+  fw = fopen(nom_fichier, "w");
+  for(i = 0; i < SIZE; i++){
+    for(j = 0; j < SIZE; j++){
+      fprintf(fw, "%d ", b[i][j]);
+    }
+  fprintf(fw, "\n");
+  }
+  fprintf(fw, "%d %d %d %d", compt.nb_b, compt.nb_w, compt.nb_rb, compt.nb_rw);
+  fprintf(fw, " %d\n", tour(c.pl));
+  fclose(fw);
+}
+//exemple d'utilisation
+//sauvegarde("sauvegarde_2_player.txt", tab, c, compt);
+
+/* fonction de chargement du jeu */
+void chargement(const char *nom_fichier,content (*b)[SIZE], coup *c, compteur *compt){
+  FILE *fr = NULL;
+  int i, j;
+  fr = fopen(nom_fichier, "r");
+  if(fr != NULL){
+    for(i = 0; i < SIZE; i++){
+      for(j = 0; j < SIZE; j++){
+        fscanf(fr, "%d", &b[i][j]);
+      }
+    }
+    fscanf(fr, "%d", &compt -> nb_b);
+    fscanf(fr, "%d", &compt -> nb_w);
+    fscanf(fr, "%d", &compt -> nb_rb);
+    fscanf(fr, "%d", &compt -> nb_rw);
+    fscanf(fr, "%d", &c -> pl);
+  }
+  else{
+    printf("La sauvegarde n'existe pas.\n");
+  }
+}
+//exemple d'utilisation
+//chargement("sauvegarde_2_player.txt", tab, &c, &compt);
 
 /******************************************
  *           FONCTION PRINCIPALE          *
@@ -607,21 +693,19 @@ int main(){
   ban.d = OUEST;
   erreur err;
   char replay;
-  int pl;
+  int player;
   compt.nb_b = compt.nb_w = compt2.nb_b = compt2.nb_w = 0;
   compt.nb_rb = compt.nb_rw = compt2.nb_rb = compt2.nb_rw = 0;
 
   printf("\nKuba ready to play !!!\n\n");
-  printf("How many players (1 or 2)? : ");
-  scanf("%d", &pl);
-  printf("\n\n");
+  player = choose_nb_player();
 
   init_board(plateau);
   print_board(plateau, &compt);
   printf("\nWhite begin\n");
   //if (pl==2){
     while (winner(compt)==PLAYING){
-      choose_move1(&c);
+      choose_move(&c);
       err = reply(plateau, c, &ban);
       switch (err){
         case EMPTY_POS:
@@ -663,8 +747,7 @@ int main(){
             break;
           }
 
-          printf ("\nwould you like to replay ? (y or n) : ");
-          scanf ("%s", &replay);
+          replay = choose_replay();
 
           if(replay == 'n'){
             c.pl = tour(c.pl);
