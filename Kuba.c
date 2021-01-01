@@ -406,7 +406,7 @@ result winner(compteur compt){
  ******************************************/
 
 /* fonction de sauvegarde du jeu */
-void sauvegarde(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt, int size){
+void sauvegarde(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt){
   FILE *fw;
   int i, j;
   fw = fopen(nom_fichier, "w");
