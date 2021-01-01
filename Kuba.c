@@ -21,7 +21,7 @@ typedef enum {
 } content;
 
 //emplacement des pions 2.3.4
-//emplacement des pions noir
+/* emplacement des pions noir */
 void where_b (content (*b)[SIZE]){
   int i,j;
   for (i=0;i<SIZE;i++){
@@ -33,7 +33,7 @@ void where_b (content (*b)[SIZE]){
   }
 }
 
-//emplacement des pions blanc
+/* emplacement des pions blanc */
 void where_w(content (*b)[SIZE]){
   int i, j;
   for(i = 0; i < SIZE; i++){
@@ -45,7 +45,7 @@ void where_w(content (*b)[SIZE]){
   }
 }
 
-//emplacement des pions rouge
+/* emplacement des pions rouge */
 void where_r(content (*b)[SIZE]){
   int i, j;
   for(i = 2; i <= 4; i++){
@@ -60,7 +60,7 @@ void where_r(content (*b)[SIZE]){
   b[5][3]= RED_P;
 }
 
-//fonction d'initialisation du plateau 5:
+/* fonction d'initialisation du plateau 5 */
 void init_board(content (*b)[SIZE]){
   int i, j;
   for(i = 0; i < SIZE; i++){
@@ -98,14 +98,14 @@ typedef struct{
   direction d;
 }ban_coup;
 
-//fonction d'echange de pions 6
+/* fonction d'echange de pions 6 */
 void swap (content *i, content *j) {
   int n = *i;
   *i = *j;
   *j = n;
 }
 
-//fonction de déplacement vers le nord 7
+/* fonction de déplacement vers le nord 7 */
 content dpl_N(content (*b)[SIZE], position pos, ban_coup *ban){
   int i, n;
   content a = EMPTY;
@@ -129,7 +129,7 @@ content dpl_N(content (*b)[SIZE], position pos, ban_coup *ban){
   return a;
 }
 
-//fonction de déplacement vers le sud 8
+/* fonction de déplacement vers le sud 8 */
 content dpl_S(content (*b)[SIZE], position pos, ban_coup *ban){
   int i, n;
   content a = EMPTY;
@@ -152,7 +152,7 @@ content dpl_S(content (*b)[SIZE], position pos, ban_coup *ban){
   }
   return a;
 }
-//fonction de déplacement vers l'est 9
+/* fonction de déplacement vers l'est 9 */
 content dpl_E(content (*b)[SIZE], position pos, ban_coup *ban){
   int j, n;
   content a = EMPTY;
@@ -176,7 +176,7 @@ content dpl_E(content (*b)[SIZE], position pos, ban_coup *ban){
   return a;
 }
 
-//fonction de déplacement vers l'ouest 10
+/* fonction de déplacement vers l'ouest 10 */
 content dpl_O(content (*b)[SIZE],position pos, ban_coup *ban){
   int j, n;
   content a = EMPTY;
@@ -200,7 +200,7 @@ content dpl_O(content (*b)[SIZE],position pos, ban_coup *ban){
   return a;
 }
 
-//fonction déplacement des pions 11
+/* fonction déplacement des pions 11 */
 content deplacement (content (*b)[SIZE] ,position pos, direction dir, ban_coup *ban){
   switch (dir){
     case NORD : return dpl_N(b, pos, ban);
@@ -231,7 +231,7 @@ typedef struct{
   int nb_rw;
 }compteur;
 
-//fonction changement de joueur 12
+/* fonction changement de joueur 12 */
 joueur tour (joueur jou){
   if (jou==JOUB){
     return JOUW;
@@ -239,7 +239,7 @@ joueur tour (joueur jou){
   return JOUB;
 }
 
-//fonction compteur 13
+/* fonction compteur 13 */
 void compte (content a, joueur j, compteur *c){
   if(j == JOUB){
     switch(a){
@@ -257,7 +257,7 @@ void compte (content a, joueur j, compteur *c){
   }
 }
 
-//fonction de vérification d'incrémentation du compteur
+/* fonction de vérification d'incrémentation du compteur */
 int verif_compt(compteur c1, compteur c2){
   return(c1.nb_w != c2.nb_w || c1.nb_rw != c2.nb_rw ||
         c1.nb_b != c2.nb_b || c1.nb_rb != c2.nb_rb);
@@ -315,7 +315,7 @@ void choose_move1(coup *c){
     }while(!flag);
 }
 
-/* fonction demandant un coup a jouer au joueur*/
+/* fonction demandant un coup a jouer au joueur */
 void choose_move(coup *c){
   int k, i, j, flag;
   char dir;
@@ -406,7 +406,7 @@ result winner(compteur compt){
  ******************************************/
 
 /* fonction de sauvegarde du jeu */
-void sauvegarde(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt){
+void save_game(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt){
   FILE *fw;
   int i, j;
   fw = fopen(nom_fichier, "w");
@@ -421,10 +421,10 @@ void sauvegarde(const char *nom_fichier, content (*b)[SIZE], coup c, compteur co
   fclose(fw);
 }
 //exemple d'utilisation
-//sauvegarde("sauvegarde_2_player.txt", tab, c, compt);
+//save_game("save_2_player.txt", tab, c, compt);
 
 /* fonction de chargement du jeu */
-void chargement(const char *nom_fichier,content (*b)[SIZE], coup *c, compteur *compt){
+void loading_game(const char *nom_fichier,content (*b)[SIZE], coup *c, compteur *compt){
   FILE *fr = NULL;
   int i, j;
   fr = fopen(nom_fichier, "r");
@@ -441,11 +441,11 @@ void chargement(const char *nom_fichier,content (*b)[SIZE], coup *c, compteur *c
     fscanf(fr, "%d", &c -> pl);
   }
   else{
-    printf("La sauvegarde n'existe pas.\n");
+    printf("saving doesn't exist.\n");
   }
 }
 //exemple d'utilisation
-//chargement("sauvegarde_2_player.txt", tab, &c, &compt);
+//loading_game("save_2_player.txt", tab, &c, &compt);
 
 /******************************************
  *           FONCTION PRINCIPALE          *
@@ -462,9 +462,10 @@ typedef enum {
   SUCCES
 }erreur;
 
-//fonction pr savoir s'il y a un espace derriere 14
-//TRUE=pas d'espace
-//FALSE=il y a un espace ou vide
+/* fonction pr savoir s'il y a un espace derriere 14 */
+/* TRUE = pas d'espace
+ * FALSE = il y a un espace ou vide
+ */
 int sansespace (content b[SIZE][SIZE], coup c){
  switch(c.dir){
     case NORD:
@@ -494,6 +495,7 @@ int sansespace (content b[SIZE][SIZE], coup c){
   return 0;
 }
 
+/* fonction verifiant qu'un joueur ne fait pas sortir son pion */
 content sortie_pion(content (*b)[SIZE], coup c){
   int i, j, n;
   switch(c.dir) {
@@ -539,7 +541,7 @@ content sortie_pion(content (*b)[SIZE], coup c){
   }
 }
 
-//fonction reponse 16
+/* fonction reponse du coup à jouer 16 */
 erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
   if (b[c.pos.i][c.pos.j]==EMPTY){
     return EMPTY_POS;
@@ -569,7 +571,7 @@ erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
  *               AFFICHAGE                *
  ******************************************/
 
-// fonction d'affichage des numéros de colonne
+/* fonction d'affichage des numéros de colonne du plateau */
 void affichage_num_col(){
   int i;
   if (SIZE > 10){
@@ -590,7 +592,7 @@ void affichage_num_col(){
   printf("\n");
 }
 
-// fonction d'affichage de la délimitation du haut et bas plateau
+/* fonction d'affichage de la délimitation du haut et bas plateau */
 void affichage_bord(){
   int i;
   if (SIZE > 10){
@@ -605,7 +607,7 @@ void affichage_bord(){
   printf("+\n");
 }
 
-// fonction d'affichage de la délimitation droite et des numéros de ligne du plateau
+/* fonction d'affichage de la délimitation droite et des numéros de ligne du plateau */
 void affichage_bord_droite(int i){
     if (SIZE > 10){
       if (i < 10){
@@ -638,7 +640,7 @@ void print_line(){
   }
 }
 
-/* fonction d'affichage des points */
+/* fonction d'affichage du tableau des scores */
 void print_score(compteur *compt){
   print_line();
   printf("\n|               SCORE                 |\n");
@@ -676,7 +678,9 @@ void print_board(content (*b)[SIZE], compteur *compt) {
   printf("\n");
 }
 
-//condition pr gagner : 7 billes r ou toutes les billes adverses
+/* condition pour gagner : 7 billes rouges
+ * ou toutes les billes adverses */
+
 /******************************************
  *                  MAIN                  *
  ******************************************/
