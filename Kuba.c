@@ -21,7 +21,7 @@ typedef enum {
 } content;
 
 //emplacement des pions 2.3.4
-/* emplacement des pions noir */
+//emplacement des pions noir
 void where_b (content (*b)[SIZE]){
   int i,j;
   for (i=0;i<SIZE;i++){
@@ -33,7 +33,7 @@ void where_b (content (*b)[SIZE]){
   }
 }
 
-/* emplacement des pions blanc */
+//emplacement des pions blanc
 void where_w(content (*b)[SIZE]){
   int i, j;
   for(i = 0; i < SIZE; i++){
@@ -45,7 +45,7 @@ void where_w(content (*b)[SIZE]){
   }
 }
 
-/* emplacement des pions rouge */
+//emplacement des pions rouge
 void where_r(content (*b)[SIZE]){
   int i, j;
   for(i = 2; i <= 4; i++){
@@ -60,7 +60,7 @@ void where_r(content (*b)[SIZE]){
   b[5][3]= RED_P;
 }
 
-/* fonction d'initialisation du plateau 5 */
+//fonction d'initialisation du plateau 5:
 void init_board(content (*b)[SIZE]){
   int i, j;
   for(i = 0; i < SIZE; i++){
@@ -98,14 +98,14 @@ typedef struct{
   direction d;
 }ban_coup;
 
-/* fonction d'echange de pions 6 */
+//fonction d'echange de pions 6
 void swap (content *i, content *j) {
   int n = *i;
   *i = *j;
   *j = n;
 }
 
-/* fonction de déplacement vers le nord 7 */
+//fonction de déplacement vers le nord 7
 content dpl_N(content (*b)[SIZE], position pos, ban_coup *ban){
   int i, n;
   content a = EMPTY;
@@ -129,7 +129,7 @@ content dpl_N(content (*b)[SIZE], position pos, ban_coup *ban){
   return a;
 }
 
-/* fonction de déplacement vers le sud 8 */
+//fonction de déplacement vers le sud 8
 content dpl_S(content (*b)[SIZE], position pos, ban_coup *ban){
   int i, n;
   content a = EMPTY;
@@ -152,7 +152,7 @@ content dpl_S(content (*b)[SIZE], position pos, ban_coup *ban){
   }
   return a;
 }
-/* fonction de déplacement vers l'est 9 */
+//fonction de déplacement vers l'est 9
 content dpl_E(content (*b)[SIZE], position pos, ban_coup *ban){
   int j, n;
   content a = EMPTY;
@@ -176,7 +176,7 @@ content dpl_E(content (*b)[SIZE], position pos, ban_coup *ban){
   return a;
 }
 
-/* fonction de déplacement vers l'ouest 10 */
+//fonction de déplacement vers l'ouest 10
 content dpl_O(content (*b)[SIZE],position pos, ban_coup *ban){
   int j, n;
   content a = EMPTY;
@@ -200,7 +200,7 @@ content dpl_O(content (*b)[SIZE],position pos, ban_coup *ban){
   return a;
 }
 
-/* fonction déplacement des pions 11 */
+//fonction déplacement des pions 11
 content deplacement (content (*b)[SIZE] ,position pos, direction dir, ban_coup *ban){
   switch (dir){
     case NORD : return dpl_N(b, pos, ban);
@@ -231,7 +231,7 @@ typedef struct{
   int nb_rw;
 }compteur;
 
-/* fonction changement de joueur 12 */
+//fonction changement de joueur 12
 joueur tour (joueur jou){
   if (jou==JOUB){
     return JOUW;
@@ -239,7 +239,7 @@ joueur tour (joueur jou){
   return JOUB;
 }
 
-/* fonction compteur 13 */
+//fonction compteur 13
 void compte (content a, joueur j, compteur *c){
   if(j == JOUB){
     switch(a){
@@ -257,7 +257,7 @@ void compte (content a, joueur j, compteur *c){
   }
 }
 
-/* fonction de vérification d'incrémentation du compteur */
+//fonction de vérification d'incrémentation du compteur
 int verif_compt(compteur c1, compteur c2){
   return(c1.nb_w != c2.nb_w || c1.nb_rw != c2.nb_rw ||
         c1.nb_b != c2.nb_b || c1.nb_rb != c2.nb_rb);
@@ -289,7 +289,24 @@ int choose_nb_player(){
   return pl;
 }
 
+/* fonction demandant si l'on souhaite charger la derniere partie sauvegarde */
+char choose_load(){
+  int flag; char ld;
+  do{
+      flag = 1;
+      printf("do you want to continue the last game played ? (y or n) : ");
+      scanf(" %c", &ld);
+      switch (ld) {
+        case 'y': break;
+        case 'n': break;
+        default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+      }
+  }while(!flag);
+  return ld;
+}
+
 /* fonction demandant un coup a jouer au joueur */
+/*
 void choose_move1(coup *c){
   int flag, k, l;
   char t;
@@ -313,10 +330,10 @@ void choose_move1(coup *c){
         c -> pos.j = l;
       }
     }while(!flag);
-}
+}*/
 
-/* fonction demandant un coup a jouer au joueur */
-void choose_move(coup *c){
+/* fonction demandant un coup a jouer au joueur*/
+int choose_move(coup *c){
   int k, i, j, flag;
   char dir;
 
@@ -356,11 +373,13 @@ void choose_move(coup *c){
         case 'S': c -> dir = SUD; break;
         case 'E': c -> dir = EST; break;
         case 'W': c -> dir = OUEST; break;
+        case 'Q': return 1;
         default : flag = 0; printf("Invalid direction, direction must be N, S, E, or W.\n");
       }
   }while(!flag);
   c -> pos.i = i;
   c -> pos.j = j;
+  return 0;
 }
 
 /* fonction demandant au joueur si il souhaite rejouer */
@@ -379,30 +398,10 @@ char choose_replay(){
   }while(!flag);
   return rp;
 }
-/******************************************
- *        DETECTION D'UN GAGNANT          *
- ******************************************/
-
-/* type representant un gagnant */
-typedef enum{
-  PLAYING,
-  WHITE_WIN,
-  BLACK_WIN,
-} result;
-
-/* fonction renvoyant un gagnant s'il y a un gagnant */
-result winner(compteur compt){
-  if(compt.nb_b == 8 || compt.nb_rw == 7){
-    return WHITE_WIN;
-  }
-  if(compt.nb_w == 8 || compt.nb_rb == 7){
-    return BLACK_WIN;
-  }
-  return PLAYING;
-}
 
 /******************************************
  *         SAUVEGARDE / CHARGEMENT        *
+ *         INITIALISATION PLATEAU         *
  ******************************************/
 
 /* fonction de sauvegarde du jeu */
@@ -442,10 +441,57 @@ void loading_game(const char *nom_fichier,content (*b)[SIZE], coup *c, compteur 
   }
   else{
     printf("saving doesn't exist.\n");
+    init_board(b);
   }
 }
 //exemple d'utilisation
 //loading_game("save_2_player.txt", tab, &c, &compt);
+
+/* fonction d'initialisation du plateau */
+void load_board(content (*b)[SIZE], coup c, compteur compt, compteur compt2, char load, int player){
+  if(load == 'y'){
+    if(player == 2){
+      loading_game("sauvegarde_2_player.save", b, &c, &compt);
+      compt2.nb_rw = compt.nb_rw;
+      compt2.nb_w = compt.nb_w;
+      compt2.nb_rb = compt.nb_rb;
+      compt2.nb_b = compt.nb_b;
+    }
+    else if(player == 1){
+      loading_game("sauvegarde_1_player.save", b, &c, &compt);
+      compt2.nb_rw = compt.nb_rw;
+      compt2.nb_w = compt.nb_w;
+      compt2.nb_rb = compt.nb_rb;
+      compt2.nb_b = compt.nb_b;
+    }
+  }
+  else{
+    init_board(b);
+    printf("\nWhite begin\n");
+  }
+}
+
+/******************************************
+ *        DETECTION D'UN GAGNANT          *
+ ******************************************/
+
+/* type representant un gagnant */
+typedef enum{
+  PLAYING,
+  WHITE_WIN,
+  BLACK_WIN,
+} result;
+
+/* fonction renvoyant un gagnant s'il y a un gagnant */
+result winner(compteur compt){
+  if(compt.nb_b == 8 || compt.nb_rw == 7){
+    return WHITE_WIN;
+  }
+  if(compt.nb_w == 8 || compt.nb_rb == 7){
+    return BLACK_WIN;
+  }
+  return PLAYING;
+}
 
 /******************************************
  *           FONCTION PRINCIPALE          *
@@ -462,10 +508,9 @@ typedef enum {
   SUCCES
 }erreur;
 
-/* fonction pr savoir s'il y a un espace derriere 14 */
-/* TRUE = pas d'espace
- * FALSE = il y a un espace ou vide
- */
+//fonction pr savoir s'il y a un espace derriere 14
+//TRUE=pas d'espace
+//FALSE=il y a un espace ou vide
 int sansespace (content b[SIZE][SIZE], coup c){
  switch(c.dir){
     case NORD:
@@ -495,7 +540,6 @@ int sansespace (content b[SIZE][SIZE], coup c){
   return 0;
 }
 
-/* fonction verifiant qu'un joueur ne fait pas sortir son pion */
 content sortie_pion(content (*b)[SIZE], coup c){
   int i, j, n;
   switch(c.dir) {
@@ -541,7 +585,7 @@ content sortie_pion(content (*b)[SIZE], coup c){
   }
 }
 
-/* fonction reponse du coup à jouer 16 */
+//fonction reponse 16
 erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
   if (b[c.pos.i][c.pos.j]==EMPTY){
     return EMPTY_POS;
@@ -568,10 +612,26 @@ erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
 }
 
 /******************************************
+ *             CHOIX DE L'ORDI            *
+ ******************************************/
+
+/* fonction choissant un coup */
+void choose_move_computer(content (*b)[7], coup *c, ban_coup *ban){
+  int i, j, k;
+  erreur err;
+  do{
+    c -> pos.i = rand() % SIZE;
+    c -> pos.j = rand() % SIZE;
+    c -> dir = rand() % 4;
+    err = reply(b, *c, ban);
+  }while(err != SUCCES);
+}
+
+/******************************************
  *               AFFICHAGE                *
  ******************************************/
 
-/* fonction d'affichage des numéros de colonne du plateau */
+// fonction d'affichage des numéros de colonne
 void affichage_num_col(){
   int i;
   if (SIZE > 10){
@@ -592,7 +652,7 @@ void affichage_num_col(){
   printf("\n");
 }
 
-/* fonction d'affichage de la délimitation du haut et bas plateau */
+// fonction d'affichage de la délimitation du haut et bas plateau
 void affichage_bord(){
   int i;
   if (SIZE > 10){
@@ -607,7 +667,7 @@ void affichage_bord(){
   printf("+\n");
 }
 
-/* fonction d'affichage de la délimitation droite et des numéros de ligne du plateau */
+// fonction d'affichage de la délimitation droite et des numéros de ligne du plateau
 void affichage_bord_droite(int i){
     if (SIZE > 10){
       if (i < 10){
@@ -640,7 +700,7 @@ void print_line(){
   }
 }
 
-/* fonction d'affichage du tableau des scores */
+/* fonction d'affichage des points */
 void print_score(compteur *compt){
   print_line();
   printf("\n|               SCORE                 |\n");
@@ -678,12 +738,41 @@ void print_board(content (*b)[SIZE], compteur *compt) {
   printf("\n");
 }
 
-/* condition pour gagner : 7 billes rouges
- * ou toutes les billes adverses */
-
+//condition pr gagner : 7 billes r ou toutes les billes adverses
 /******************************************
  *                  MAIN                  *
  ******************************************/
+/*
+int main(){
+
+  coup c;
+  c.pl = JOUB;
+  compteur compt;
+  compt.nb_rw = compt.nb_rb = compt.nb_w = compt.nb_b = 4;
+
+  content tab[SIZE][SIZE] =
+  {{BLACK_P, BLACK_P, EMPTY, EMPTY, EMPTY, WHITE_P, WHITE_P},
+  {BLACK_P, BLACK_P, EMPTY, RED_P, EMPTY, WHITE_P, WHITE_P},
+  {EMPTY, EMPTY, RED_P, RED_P, RED_P, EMPTY, EMPTY},
+  {EMPTY, RED_P, RED_P, RED_P, RED_P, RED_P, EMPTY},
+  {EMPTY, EMPTY, RED_P, RED_P, RED_P, EMPTY, EMPTY},
+  {WHITE_P, WHITE_P, EMPTY, RED_P, EMPTY, BLACK_P, BLACK_P},
+  {WHITE_P, WHITE_P, EMPTY, EMPTY, EMPTY, BLACK_P, BLACK_P},};
+
+
+  print_board(tab, &compt);
+  print_tour(c);
+
+  //save_game("sauvegarde_2_player.save", tab, c, compt);
+  loading_game("sauvegarde_2_player.save", tab, &c, &compt);
+
+  print_board(tab, &compt);
+  printf("%d\n", c.pl);
+  print_tour(c);
+
+
+  return 0;
+}*/
 
 int main(){
   srand((time(NULL)));
@@ -696,19 +785,27 @@ int main(){
   ban.a = ban.b = -1;
   ban.d = OUEST;
   erreur err;
-  char replay;
+  char replay, load;
   int player;
   compt.nb_b = compt.nb_w = compt2.nb_b = compt2.nb_w = 0;
   compt.nb_rb = compt.nb_rw = compt2.nb_rb = compt2.nb_rw = 0;
 
-  printf("\nKuba ready to play !!!\n\n");
-  player = choose_nb_player();
 
-  init_board(plateau);
+  printf("\nKuba ready to play !!!\n\n");
+  player = choose_nb_player(); //nb de joueur
+  load = choose_load();//continué derniere partie jouer ou non
+
+  load_board(plateau, c, compt, compt2, load, player);
+  //initialisation du plateau ou chargement de celui-ci
+
+  //init_board(plateau);
   print_board(plateau, &compt);
-  printf("\nWhite begin\n");
-  //if (pl==2){
-    while (winner(compt)==PLAYING){
+  //printf("\nWhite begin\n");
+
+
+  while (winner(compt)==PLAYING){
+    print_tour(c);
+    if(player == 2 || (player == 1 && c.pl == JOUW)){
       choose_move(&c);
       err = reply(plateau, c, &ban);
       switch (err){
@@ -758,31 +855,39 @@ int main(){
           }
         }
         else {
-          c.pl=tour(c.pl);
+            c.pl = tour(c.pl);
         }
-
       }
+    }
+    else if(player == 1 && c.pl == JOUB){
+      choose_move_computer(plateau, &c, &ban);
+      a = deplacement(plateau, c.pos, c.dir, &ban);
+        compte(a, c.pl, &compt);
+        printf("\n\n");
+        print_board(plateau, &compt);
 
-      print_tour(c);
+        if (verif_compt(compt, compt2) == 1){
+          compt2.nb_rw = compt.nb_rw;
+          compt2.nb_w = compt.nb_w;
+          compt2.nb_rb = compt.nb_rb;
+          compt2.nb_b = compt.nb_b;
+
+          if (winner(compt)!=PLAYING){
+            break;
+          }
+        }
+        else {
+            c.pl=tour(c.pl);
+        }
     }
-    result win;
-    win = winner(compt);
-    switch(win){
-      case WHITE_WIN: printf("White Win's !!"); break;
-      case BLACK_WIN: printf("Black win's !!"); break;
-      default: break;
-    }
-    //}
-  //}
+  //print_tour(c);
+  }
+  result win;
+  win = winner(compt);
+  switch(win){
+    case WHITE_WIN: printf("White Win's !!"); break;
+    case BLACK_WIN: printf("Black win's !!"); break;
+    default: break;
+  }
   return 0;
 }
-/*
-  else if(pl==1){
-    while (winner(compt)==PLAYING){
-
-    }
-  }
-
-
-  return 0;
-}*/
