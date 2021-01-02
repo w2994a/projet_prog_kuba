@@ -332,7 +332,7 @@ void choose_move1(coup *c){
     }while(!flag);
 }*/
 
-/* fonction demandant un coup a jouer au joueur*/
+/* fonction demandant un coup a jouer au joueur */
 int choose_move(coup *c){
   int k, i, j, flag;
   char dir;
@@ -508,10 +508,11 @@ typedef enum {
   SUCCES
 }erreur;
 
-//fonction pr savoir s'il y a un espace derriere 14
-//TRUE=pas d'espace
-//FALSE=il y a un espace ou vide
-int sansespace (content b[SIZE][SIZE], coup c){
+/* fonction pour savoir s'il y a un espace derriere 14 */
+/* TRUE=pas d'espace
+ * FALSE=il y a un espace ou vide
+ */
+int sansespace (content (*b)[SIZE], coup c){
  switch(c.dir){
     case NORD:
     if(c.pos.i == SIZE-1){
@@ -540,6 +541,8 @@ int sansespace (content b[SIZE][SIZE], coup c){
   return 0;
 }
 
+/* fonction verifiant si le pion du joueur dont c'est le tour sort
+ * du plateau */
 content sortie_pion(content (*b)[SIZE], coup c){
   int i, j, n;
   switch(c.dir) {
@@ -585,8 +588,8 @@ content sortie_pion(content (*b)[SIZE], coup c){
   }
 }
 
-//fonction reponse 16
-erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
+/* fonction reponse 16 */
+erreur reply (content (*b)[SIZE], coup c, ban_coup *ban){
   if (b[c.pos.i][c.pos.j]==EMPTY){
     return EMPTY_POS;
   }
@@ -616,7 +619,7 @@ erreur reply (content b[SIZE][SIZE], coup c, ban_coup *ban){
  ******************************************/
 
 /* fonction choissant un coup */
-void choose_move_computer(content (*b)[7], coup *c, ban_coup *ban){
+void choose_move_computer(content (*b)[SIZE], coup *c, ban_coup *ban){
   int i, j, k;
   erreur err;
   do{
@@ -631,7 +634,7 @@ void choose_move_computer(content (*b)[7], coup *c, ban_coup *ban){
  *               AFFICHAGE                *
  ******************************************/
 
-// fonction d'affichage des numéros de colonne
+/* fonction d'affichage des numéros de colonne du plateau */
 void affichage_num_col(){
   int i;
   if (SIZE > 10){
@@ -652,7 +655,7 @@ void affichage_num_col(){
   printf("\n");
 }
 
-// fonction d'affichage de la délimitation du haut et bas plateau
+/* fonction d'affichage de la délimitation du haut et bas plateau */
 void affichage_bord(){
   int i;
   if (SIZE > 10){
@@ -667,7 +670,8 @@ void affichage_bord(){
   printf("+\n");
 }
 
-// fonction d'affichage de la délimitation droite et des numéros de ligne du plateau
+/* fonction d'affichage de la délimitation droite et
+ * des numéros de ligne du plateau */
 void affichage_bord_droite(int i){
     if (SIZE > 10){
       if (i < 10){
@@ -738,63 +742,35 @@ void print_board(content (*b)[SIZE], compteur *compt) {
   printf("\n");
 }
 
-//condition pr gagner : 7 billes r ou toutes les billes adverses
+/* condition pour gagner : 7 billes rouge
+ * ou toutes les billes adverses
+ */
+
 /******************************************
  *                  MAIN                  *
  ******************************************/
-/*
-int main(){
-
-  coup c;
-  c.pl = JOUB;
-  compteur compt;
-  compt.nb_rw = compt.nb_rb = compt.nb_w = compt.nb_b = 4;
-
-  content tab[SIZE][SIZE] =
-  {{BLACK_P, BLACK_P, EMPTY, EMPTY, EMPTY, WHITE_P, WHITE_P},
-  {BLACK_P, BLACK_P, EMPTY, RED_P, EMPTY, WHITE_P, WHITE_P},
-  {EMPTY, EMPTY, RED_P, RED_P, RED_P, EMPTY, EMPTY},
-  {EMPTY, RED_P, RED_P, RED_P, RED_P, RED_P, EMPTY},
-  {EMPTY, EMPTY, RED_P, RED_P, RED_P, EMPTY, EMPTY},
-  {WHITE_P, WHITE_P, EMPTY, RED_P, EMPTY, BLACK_P, BLACK_P},
-  {WHITE_P, WHITE_P, EMPTY, EMPTY, EMPTY, BLACK_P, BLACK_P},};
-
-
-  print_board(tab, &compt);
-  print_tour(c);
-
-  //save_game("sauvegarde_2_player.save", tab, c, compt);
-  loading_game("sauvegarde_2_player.save", tab, &c, &compt);
-
-  print_board(tab, &compt);
-  printf("%d\n", c.pl);
-  print_tour(c);
-
-
-  return 0;
-}*/
 
 int main(){
   srand((time(NULL)));
 
   coup c;
-  c.pl=JOUW;
   content plateau[SIZE][SIZE], a;
   compteur compt, compt2;
   ban_coup ban;
-  ban.a = ban.b = -1;
-  ban.d = OUEST;
   erreur err;
   char replay, load;
   int player;
+
+  c.pl=JOUW;
+  ban.a = ban.b = -1;
+  ban.d = OUEST;
   compt.nb_b = compt.nb_w = compt2.nb_b = compt2.nb_w = 0;
   compt.nb_rb = compt.nb_rw = compt2.nb_rb = compt2.nb_rw = 0;
 
 
   printf("\nKuba ready to play !!!\n\n");
-  player = choose_nb_player(); //nb de joueur
-  load = choose_load();//continué derniere partie jouer ou non
-
+  player = choose_nb_player(); //nb de joueurs
+  load = choose_load();//continue derniere partie jouer ou non
   load_board(plateau, c, compt, compt2, load, player);
   //initialisation du plateau ou chargement de celui-ci
 
