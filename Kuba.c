@@ -487,6 +487,7 @@ char choose_pass_tour(){
         default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
       }
   }while(!flag);
+  printf("\n");
   return pt;
 }
 
@@ -519,14 +520,14 @@ void save_game(const char *nom_fichier, content (*b)[SIZE], coup c, compteur com
   fw = fopen(nom_fichier, "w");
   for(i = 0; i < SIZE; i++){
     for(j = 0; j < SIZE; j++){
-      fprintf(fw, "%d ", b[i][j]);
+      fprintf(fw, "%u ", b[i][j]);
     }
     fprintf(fw, "\n");
   }
-  fprintf(fw, "%d %d %d %d %d %d %d %d", compt.nb_b, compt.nb_w, compt.nb_g, compt.nb_o, compt.nb_rb, compt.nb_rw, compt.nb_rg,compt.nb_ro);
-  fprintf(fw, " %d %d %d %d", rem_pawn.nb_b, rem_pawn.nb_w,           rem_pawn.nb_g, rem_pawn.nb_o);
-  fprintf(fw, " %d %d %d", bc.a, bc.b, bc.d);
-  fprintf(fw, " %d\n", c.pl);
+  fprintf(fw, "%u %u %u %u %u %u %u %u", compt.nb_b, compt.nb_w, compt.nb_g, compt.nb_o, compt.nb_rb, compt.nb_rw, compt.nb_rg,compt.nb_ro);
+  fprintf(fw, " %u %u %u %u", rem_pawn.nb_b, rem_pawn.nb_w,           rem_pawn.nb_g, rem_pawn.nb_o);
+  fprintf(fw, " %u %u %u", bc.a, bc.b, bc.d);
+  fprintf(fw, " %u\n", c.pl);
   fclose(fw);
 }
 //exemple d'utilisation
@@ -540,29 +541,29 @@ void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c, compteur
   if(fr != NULL){
     for(i = 0; i < SIZE; i++){
       for(j = 0; j < SIZE; j++){
-        fscanf(fr, "%d", &b[i][j]);
+        fscanf(fr, "%u", &b[i][j]);
       }
     }
 
-    fscanf(fr, "%d ", &compt -> nb_b);
-    fscanf(fr, "%d ", &compt -> nb_w);
-    fscanf(fr, "%d ", &compt -> nb_g);
-    fscanf(fr, "%d ", &compt -> nb_o);
-    fscanf(fr, "%d ", &compt -> nb_rb);
-    fscanf(fr, "%d ", &compt -> nb_rw);
-    fscanf(fr, "%d ", &compt -> nb_rg);
-    fscanf(fr, "%d ", &compt -> nb_ro);
+    fscanf(fr, "%u ", &compt -> nb_b);
+    fscanf(fr, "%u ", &compt -> nb_w);
+    fscanf(fr, "%u ", &compt -> nb_g);
+    fscanf(fr, "%u ", &compt -> nb_o);
+    fscanf(fr, "%u ", &compt -> nb_rb);
+    fscanf(fr, "%u ", &compt -> nb_rw);
+    fscanf(fr, "%u ", &compt -> nb_rg);
+    fscanf(fr, "%u ", &compt -> nb_ro);
 
-    fscanf(fr, "%d ", &rem_pawn -> nb_b);
-    fscanf(fr, "%d ", &rem_pawn -> nb_w);
-    fscanf(fr, "%d ", &rem_pawn -> nb_g);
-    fscanf(fr, "%d ", &rem_pawn -> nb_o);
+    fscanf(fr, "%u ", &rem_pawn -> nb_b);
+    fscanf(fr, "%u ", &rem_pawn -> nb_w);
+    fscanf(fr, "%u ", &rem_pawn -> nb_g);
+    fscanf(fr, "%u ", &rem_pawn -> nb_o);
 
-    fscanf(fr, "%d ", &bc -> a);
-    fscanf(fr, "%d ", &bc -> b);
-    fscanf(fr, "%d ", &bc -> d);
+    fscanf(fr, "%u ", &bc -> a);
+    fscanf(fr, "%u ", &bc -> b);
+    fscanf(fr, "%u ", &bc -> d);
 
-    fscanf(fr, "%d ", &c -> pl);
+    fscanf(fr, "%u ", &c -> pl);
   }
   else{
     printf("saving doesn't exist.\n");
@@ -1035,6 +1036,7 @@ int main(){
         pass_tour = choose_pass_tour();
         if(pass_tour == 'y'){
           c.pl = tour(c.pl, rem_pawn, player);
+          print_board(plateau, &compt, &rem_pawn, player);
           continue;
         }
         else{
