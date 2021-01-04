@@ -231,6 +231,7 @@ content deplacement (content (*b)[SIZE] ,position pos, direction dir, ban_coup *
 
     case OUEST : return dpl_O(b, pos, ban);
   }
+  return EMPTY;
 }
 
 /******************************************
@@ -534,7 +535,7 @@ void save_game(const char *nom_fichier, content (*b)[SIZE], coup c, compteur com
 // fonction de chargement du jeu
 void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c, compteur *compt, compteur *rem_pawn, ban_coup *bc, int player){
   FILE *fr = NULL;
-  int i, j, tab[13];
+  int i, j;
   fr = fopen(nom_fichier, "r");
   if(fr != NULL){
     for(i = 0; i < SIZE; i++){
@@ -771,6 +772,7 @@ content sortie_pion(content (*b)[SIZE], coup c){
     }
     return b[c.pos.i][n];
   }
+  return EMPTY;
 }
 
 // fonction reponse
@@ -815,7 +817,6 @@ erreur reply (content (*b)[SIZE], coup c, ban_coup *ban){
 
 // fonction choissant un coup
 void choose_move_computer(content (*b)[SIZE], coup *c, ban_coup *ban){
-  int i, j, k;
   erreur err;
   do{
     c -> pos.i = rand() % SIZE;
@@ -834,9 +835,6 @@ void affichage_num_col(){
   int i;
   if (SIZE > 10){
     printf(" ");
-  }
-  else{
-    printf("");
   }
   printf("i|j ");
   for (i = 0; i < SIZE; i ++){
