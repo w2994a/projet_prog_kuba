@@ -125,7 +125,7 @@ void swap (content *i, content *j) {
   *j = n;
 }
 
-// fonction de déplacement vers le nord 7
+// fonction de déplacement vers le nord
 content dpl_N(content (*b)[SIZE], position pos, ban_coup *ban){
   int i, n;
   content a = EMPTY;
@@ -172,7 +172,7 @@ content dpl_S(content (*b)[SIZE], position pos, ban_coup *ban){
   }
   return a;
 }
-// fonction de déplacement vers l'est 9
+// fonction de déplacement vers l'est
 content dpl_E(content (*b)[SIZE], position pos, ban_coup *ban){
   int j, n;
   content a = EMPTY;
@@ -221,7 +221,8 @@ content dpl_O(content (*b)[SIZE],position pos, ban_coup *ban){
 }
 
 // fonction déplacement des pions
-content deplacement (content (*b)[SIZE] ,position pos, direction dir, ban_coup *ban){
+content deplacement (content (*b)[SIZE] ,position pos, direction dir,
+ban_coup *ban){
   switch (dir){
     case NORD : return dpl_N(b, pos, ban);
 
@@ -246,7 +247,7 @@ typedef enum {
   JOUO
 }joueur;
 
-//structure  permettant de representer les pions pris ou perdu par les joueurs
+// structure  permettant de representer les pions pris ou perdu par les joueurs
 typedef struct{
   int nb_b;
   int nb_w;
@@ -303,7 +304,8 @@ joueur tour (joueur jou, compteur rem_pawn, int player){
 }
 
 // fonction d'initialisation des compteurs
-void init_compt(compteur *compt, compteur *compt2, compteur *rem_pawn, int player){
+void init_compt(compteur *compt, compteur *compt2, compteur *rem_pawn,
+int player){
   compt -> nb_b = compt -> nb_w = compt2 -> nb_b = compt2 -> nb_w = 0;
   compt -> nb_g = compt -> nb_o = compt2 -> nb_g = compt2 -> nb_o = 0;
   compt -> nb_rb = compt -> nb_rw = compt2 -> nb_rb = compt2 -> nb_rw = 0;
@@ -314,7 +316,8 @@ void init_compt(compteur *compt, compteur *compt2, compteur *rem_pawn, int playe
     rem_pawn -> nb_g = rem_pawn -> nb_o = 0;
     }
   else if(player == 3 || player == 4){
-    rem_pawn -> nb_b = rem_pawn -> nb_w = rem_pawn -> nb_g = rem_pawn -> nb_o = 4;
+    rem_pawn -> nb_b = rem_pawn -> nb_w =
+    rem_pawn -> nb_g = rem_pawn -> nb_o = 4;
   }
 }
 
@@ -382,7 +385,7 @@ int verif_compt(compteur c1, compteur c2){
  *           REPONSES JOUEURS             *
  ******************************************/
 
-//structure representant un coup
+// structure representant un coup
 typedef struct{
   position pos;
   joueur pl;
@@ -397,11 +400,13 @@ int choose_nb_player(){
       k = scanf ("%d", &pl);
       __fpurge (stdin);
       if (!k) {
-        printf("Invalid entry, the number of players must be between 1 and 4.\n");
+        printf("Invalid entry, the number of players must be between 1 and \
+4.\n");
       }
       if(pl < 0 || pl > 4){
         k = 0;
-        printf("Invalid entry, the number of players must be between 1 and 4.\n");
+        printf("Invalid entry, the number of players must be between 1 and \
+4.\n");
       }
   }while (!k);
   printf("\n\n");
@@ -409,16 +414,19 @@ int choose_nb_player(){
 }
 
 // fonction demandant si l'on souhaite charger la derniere partie sauvegarde
-char choose_load(){
+char choose_load(int player){
   int flag; char ld;
   do{
       flag = 1;
-      printf("do you want continue the last game played ? (y or n) : ");
+      printf("do you want to continue the last game played with %d player(s) ?\
+\n(y or n) : ", player);
       scanf(" %c", &ld);
       switch (ld) {
         case 'y': break;
         case 'n': break;
-        default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+        default :
+          flag = 0;
+          printf("Invalid entry, the answer must be yes (y) or no (n).\n");
       }
   }while(!flag);
   return ld;
@@ -429,36 +437,40 @@ int choose_move(coup *c){
   int k, i, j, flag;
   char dir;
 
-  printf("\nchoose a pawn and a direction to move (i, j, dir): \n");
+  printf("\nchoose a pawn and a direction to move (i, j, dir) :\n");
   do{
-      printf("choose a position i :");
+      printf("choose a position i : ");
       k = scanf ("%d", &i);
       __fpurge (stdin);
       if (!k) {
-        printf("Invalid entry, positions i must be between 0 and %d.\n", SIZE-1);
+        printf("Invalid entry, position i must be between 0 and %d.\n",
+        SIZE-1);
       }
       if(i < 0 || i >= SIZE){
         k = 0;
-        printf("Invalid positions, positions i must be between 0 and %d.\n", SIZE-1);
+        printf("Invalid position, i must be between 0 and %d.\n",
+        SIZE-1);
       }
   }while (!k);
 
   do{
-      printf("choose a position j :");
+      printf("choose a position j : ");
       k = scanf ("%d", &j);
       __fpurge (stdin);
       if (!k) {
-        printf("Invalid positions, entry j must be between 0 and %d.\n", SIZE-1);
+        printf("Invalid entry, position j must be between 0 and %d.\n",
+        SIZE-1);
       }
       if(j < 0 || j >= SIZE){
         k = 0;
-        printf("Invalid positions, positions i and j must be between 0 and %d.\n", SIZE-1);
+        printf("Invalid positions, j must be between 0 and %d.\n",
+        SIZE-1);
       }
   }while (!k);
 
   do{
       flag = 1;
-      printf("choose a direction (dir): ");
+      printf("choose a direction (dir) : ");
       scanf(" %c", &dir);
       switch (dir) {
         case 'N': c -> dir = NORD; break;
@@ -466,7 +478,9 @@ int choose_move(coup *c){
         case 'E': c -> dir = EST; break;
         case 'W': c -> dir = OUEST; break;
         case 'Q': return 1;
-        default : flag = 0; printf("Invalid direction, direction must be N, S, E, or W.\n");
+        default :
+          flag = 0;
+          printf("Invalid direction, must be N, S, E, W or Q for quit.\n");
       }
   }while(!flag);
   c -> pos.i = i;
@@ -484,7 +498,9 @@ char choose_pass_tour(){
       switch (pt) {
         case 'y': break;
         case 'n': break;
-        default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+        default :
+          flag = 0;
+          printf("Invalid entry, the answer must be yes (y) or no (n).\n");
       }
   }while(!flag);
   printf("\n");
@@ -501,7 +517,9 @@ char choose_replay(){
       switch (rp) {
         case 'y': break;
         case 'n': break;
-        default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+        default :
+          flag = 0;
+          printf("Invalid entry, the answer must be yes (y) or no (n).\n");
       }
   }while(!flag);
   return rp;
@@ -514,7 +532,8 @@ char choose_replay(){
  ******************************************/
 
 // fonction de sauvegarde du jeu
-void save_game(const char *nom_fichier, content (*b)[SIZE], coup c, compteur compt, compteur rem_pawn, ban_coup bc){
+void save_game(const char *nom_fichier, content (*b)[SIZE], coup c,
+compteur compt, compteur rem_pawn, ban_coup bc){
   FILE *fw;
   int i, j;
   fw = fopen(nom_fichier, "w");
@@ -524,17 +543,18 @@ void save_game(const char *nom_fichier, content (*b)[SIZE], coup c, compteur com
     }
     fprintf(fw, "\n");
   }
-  fprintf(fw, "%u %u %u %u %u %u %u %u", compt.nb_b, compt.nb_w, compt.nb_g, compt.nb_o, compt.nb_rb, compt.nb_rw, compt.nb_rg,compt.nb_ro);
-  fprintf(fw, " %u %u %u %u", rem_pawn.nb_b, rem_pawn.nb_w,           rem_pawn.nb_g, rem_pawn.nb_o);
+  fprintf(fw, "%u %u %u %u %u %u %u %u", compt.nb_b, compt.nb_w, compt.nb_g,
+  compt.nb_o, compt.nb_rb, compt.nb_rw, compt.nb_rg,compt.nb_ro);
+  fprintf(fw, " %u %u %u %u", rem_pawn.nb_b, rem_pawn.nb_w, rem_pawn.nb_g,
+  rem_pawn.nb_o);
   fprintf(fw, " %u %u %u", bc.a, bc.b, bc.d);
   fprintf(fw, " %u\n", c.pl);
   fclose(fw);
 }
-//exemple d'utilisation
-//save_game("save_2_player.txt", tab, c, compt);
 
 // fonction de chargement du jeu
-void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c, compteur *compt, compteur *rem_pawn, ban_coup *bc, int player){
+void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c,
+compteur *compt, compteur *rem_pawn, ban_coup *bc, int player){
   FILE *fr = NULL;
   int i, j;
   fr = fopen(nom_fichier, "r");
@@ -545,25 +565,25 @@ void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c, compteur
       }
     }
 
-    fscanf(fr, "%u ", &compt -> nb_b);
-    fscanf(fr, "%u ", &compt -> nb_w);
-    fscanf(fr, "%u ", &compt -> nb_g);
-    fscanf(fr, "%u ", &compt -> nb_o);
-    fscanf(fr, "%u ", &compt -> nb_rb);
-    fscanf(fr, "%u ", &compt -> nb_rw);
-    fscanf(fr, "%u ", &compt -> nb_rg);
-    fscanf(fr, "%u ", &compt -> nb_ro);
+    fscanf(fr, "%u", &compt -> nb_b);
+    fscanf(fr, "%u", &compt -> nb_w);
+    fscanf(fr, "%u", &compt -> nb_g);
+    fscanf(fr, "%u", &compt -> nb_o);
+    fscanf(fr, "%u", &compt -> nb_rb);
+    fscanf(fr, "%u", &compt -> nb_rw);
+    fscanf(fr, "%u", &compt -> nb_rg);
+    fscanf(fr, "%u", &compt -> nb_ro);
 
-    fscanf(fr, "%u ", &rem_pawn -> nb_b);
-    fscanf(fr, "%u ", &rem_pawn -> nb_w);
-    fscanf(fr, "%u ", &rem_pawn -> nb_g);
-    fscanf(fr, "%u ", &rem_pawn -> nb_o);
+    fscanf(fr, "%u", &rem_pawn -> nb_b);
+    fscanf(fr, "%u", &rem_pawn -> nb_w);
+    fscanf(fr, "%u", &rem_pawn -> nb_g);
+    fscanf(fr, "%u", &rem_pawn -> nb_o);
 
-    fscanf(fr, "%u ", &bc -> a);
-    fscanf(fr, "%u ", &bc -> b);
-    fscanf(fr, "%u ", &bc -> d);
+    fscanf(fr, "%u", &bc -> a);
+    fscanf(fr, "%u", &bc -> b);
+    fscanf(fr, "%u", &bc -> d);
 
-    fscanf(fr, "%u ", &c -> pl);
+    fscanf(fr, "%u", &c -> pl);
   }
   else{
     printf("saving doesn't exist.\n");
@@ -571,11 +591,10 @@ void loading_game(const char *nom_fichier, content (*b)[SIZE], coup *c, compteur
     init_board(b, player);
   }
 }
-//exemple d'utilisation
-//loading_game("save_2_player.txt", tab, &c, &compt);
 
 // fonction d'initialisation ou de chargement du plateau
-void load_board(content (*b)[SIZE], coup *c, compteur *compt, compteur compt2, compteur *rem_pawn, ban_coup *bc, char load, int player){
+void load_board(content (*b)[SIZE], coup *c, compteur *compt, compteur compt2,
+compteur *rem_pawn, ban_coup *bc, char load, int player){
   if(load == 'y'){
     if(player == 2){
       loading_game("save_2_player.txt", b, c, compt, rem_pawn, bc, player);
@@ -601,8 +620,10 @@ void load_board(content (*b)[SIZE], coup *c, compteur *compt, compteur compt2, c
   }
 }
 
-// fonction de cofirmation pour quitter le jeu et demande si on souhaite sauvegarder la partie en cours.
-int choose_quit(content (*b)[SIZE], coup c, compteur compt, compteur rem_pawn, ban_coup bc, int player){
+// fonction de cofirmation pour quitter le jeu et demande si on souhaite
+// sauvegarder la partie en cours.
+int choose_quit(content (*b)[SIZE], coup c, compteur compt, compteur rem_pawn,
+ban_coup bc, int player){
   int flag;
   char k;
 
@@ -613,13 +634,16 @@ int choose_quit(content (*b)[SIZE], coup c, compteur compt, compteur rem_pawn, b
     switch (k) {
       case 'y': break;
       case 'n': return 1;
-      default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+      default :
+        flag = 0;
+        printf("Invalid entry, the answer must be yes (y) or no (n).\n");
     }
   }while(!flag);
 
   do{
     flag = 1;
-    printf("do you want to save the game ? (overwrite the last %d player saved game)\n (y or n) : ", player);
+    printf("do you want to save the game ? (overwrite the last %d player \
+saved game)\n (y or n) : ", player);
     scanf(" %c", &k);
     switch (k) {
       case 'y':
@@ -636,7 +660,9 @@ int choose_quit(content (*b)[SIZE], coup c, compteur compt, compteur rem_pawn, b
           save_game("save_4_player.txt", b, c, compt, rem_pawn, bc);
         }
       case 'n': break;
-      default : flag = 0; printf("Invalid entry, the answer must be yes (y) or no (n).\n");
+      default :
+        flag = 0;
+        printf("Invalid entry, the answer must be yes (y) or no (n).\n");
     }
   }while(!flag);
   return 0;
@@ -665,7 +691,7 @@ result winner(compteur compt, int player){
       return BLACK_WIN;
     }
   }
-  // condition pour gagner à définir dans ce cas
+
   else if(player == 3 || player == 4){
     if((compt.nb_w == 4 && compt.nb_rb >= 1 ) || compt.nb_rw == 5){
       return WHITE_WIN;
@@ -699,7 +725,8 @@ typedef enum {
   SUCCES
 }erreur;
 
-//fonction pour savoir s'il y a un espace derriere le pion qu'on veut déplacer (TRUE=pas d'espace; FALSE=il y a un espace ou vide)
+// fonction pour savoir s'il y a un espace derriere le pion qu'on veut déplacer
+// (TRUE=pas d'espace; FALSE=il y a un espace ou vide)
 int sansespace (content (*b)[SIZE], coup c){
  switch(c.dir){
     case NORD:
@@ -864,7 +891,8 @@ void affichage_bord(){
   printf("+\n");
 }
 
-//fonction d'affichage de la délimitation droite et des numéros de ligne du plateau
+// fonction d'affichage de la délimitation droite et
+// des numéros de ligne du plateau
 void affichage_bord_droite(int i){
     if (SIZE > 10){
       if (i < 10){
@@ -911,21 +939,26 @@ void print_score(compteur *compt, compteur *rem_pawn, int player){
   printf("\n| Player | Opponent's pawn | Red pawn | remaining |\n");
   printf("|        |    captured     | captured |   pawn    |\n");
   print_line();
-  printf("\n| WHITE  |        %d        |    %d     |     %d     |\n",compt -> nb_w, compt -> nb_rw, rem_pawn -> nb_w);
+  printf("\n| WHITE  |        %d        |    %d     |     %d     |\n",
+  compt -> nb_w, compt -> nb_rw, rem_pawn -> nb_w);
   print_line();
-  printf("\n| BLACK  |        %d        |    %d     |     %d     |\n",compt -> nb_b, compt -> nb_rb, rem_pawn -> nb_b);
+  printf("\n| BLACK  |        %d        |    %d     |     %d     |\n",
+  compt -> nb_b, compt -> nb_rb, rem_pawn -> nb_b);
   print_line();
   if(player > 2){
-    printf("\n| GREEN  |        %d        |    %d     |     %d     |\n",compt -> nb_g, compt -> nb_rg, rem_pawn -> nb_g);
+    printf("\n| GREEN  |        %d        |    %d     |     %d     |\n",
+    compt -> nb_g, compt -> nb_rg, rem_pawn -> nb_g);
     print_line();
-    printf("\n| ORANGE |        %d        |    %d     |     %d     |\n",compt -> nb_o, compt -> nb_ro, rem_pawn -> nb_o);
+    printf("\n| ORANGE |        %d        |    %d     |     %d     |\n",
+    compt -> nb_o, compt -> nb_ro, rem_pawn -> nb_o);
     print_line();
 
   }
 }
 
 // fonction d'affichage du plateau
-void print_board(content (*b)[SIZE], compteur *compt, compteur *rem_pawn, int player) {
+void print_board(content (*b)[SIZE], compteur *compt, compteur *rem_pawn,
+int player) {
   int i, j;
 
   printf("            ");
@@ -982,18 +1015,20 @@ int main(){
 
 
   printf("\nKuba ready to play !!!\n\n");
-  printf("To quit Kuba, entry Q instead of the direction when choosing a move to play.\n\n");
+  printf("To quit Kuba, entry Q instead of the direction when choosing a move \
+to play.\n\n");
   // nb de joueurs
   player = choose_nb_player();
-  // initialisation des compteurs de pions gagné, de pions perdu et de vérification d'indrémentation du compteur de pion gagné
+  // initialisation des compteurs de pions gagné, de pions perdu et
+  //de vérification d'indrémentation du compteur de pion gagné
   init_compt(&compt, &compt2, &rem_pawn, player);
   // initialisation du coup banni au prochain tour
   init_ban_coup(&ban);
   // initialisation du premier joueur à jouer
   c.pl = JOUW;
-  //continue derniere partie jouer ou non
-  load = choose_load();
-  //initialisation du plateau ou chargement de celui-ci
+  // continue derniere partie jouer ou non
+  load = choose_load(player);
+  // initialisation du plateau ou chargement de celui-ci
   load_board(plateau, &c, &compt, compt2, &rem_pawn, &ban, load, player);
   print_board(plateau, &compt, &rem_pawn, player);
 

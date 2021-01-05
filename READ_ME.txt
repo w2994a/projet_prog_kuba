@@ -11,7 +11,7 @@ l'adversaire (8 billes) ou 7 billes rouge.
 Ce programme permet aussi de jouer à une variante du jeu, inventé par
 les auteurs, où l'on peut jouer à Kuba à 4 joueurs ou 3 joueurs et 1
 ordinateur. Les règles sont les mêmes que le jeu original, sauf pour les
-conditions de victoires sont : capturer 4 billes (ou pions) adverse et 1
+conditions de victoires qui sont : capturer 4 billes (ou pions) adverse et 1
 billes rouge ou 5 billes rouge.
 Ce programme permet également de sauvegarder la partie en cours de jeu en
 entrant : Q à la place de la direction du coup à jouer lors de la demande de
@@ -24,6 +24,12 @@ nombre de joueur.
 
 ! attention : Lors de la sauvegarde si une sauvegarde existais déjà celle-ci
 sera écraser.
+
+l'affichage du jeu se fait dans le terminal ou le shell en ASCII. pour une
+experience optimale il est conseiller d'avoir une taille de fenêtre de terminal
+ou de shell supérieur ou égale à 90x45.
+
+
 
 +----------------------------+
 |  COMPILATION ET EXECUTION  |
